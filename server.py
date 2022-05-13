@@ -4,7 +4,7 @@ import requests
 import time
 import uvicorn
 app = FastAPI(
-    openapi_url="/weibo/openapi"
+    openapi_url="/weibo/openapi",
     docs_url="/weibo/docs",
 )
 
