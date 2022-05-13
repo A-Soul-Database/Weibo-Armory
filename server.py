@@ -3,7 +3,10 @@ from threading import Thread
 import requests
 import time
 import uvicorn
-app = FastAPI()
+app = FastAPI(
+    openapi_url="/weibo/openapi"
+    docs_url="/weibo/docs",
+)
 
 Data = {}
 Times = 0
@@ -21,14 +24,14 @@ def update():
         time.sleep(60)
 
 @Count
-@app.get("/")
+@app.get("/weibo/")
 def root():
     global Times
     Times+=1
     return {"code":"0","data":Data}
 
 @Count
-@app.get("/stastics")
+@app.get("/weibo/stastics")
 def stastics():
     global Times
     return {"code":"0","data":Times}
