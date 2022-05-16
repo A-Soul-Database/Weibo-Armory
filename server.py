@@ -24,8 +24,10 @@ def update():
     url = "https://raw.githubusercontent.com/A-Soul-Database/Weibo-Armory/main/assets/"
     while True:
         global Main_Data , Cure_Text
-        Main_Data = requests.get(url+"words.json").json()
-        Cure_Text = requests.get(url+"cure.txt").text
+        Main_Data = requests.get(url+"main_data.json").json()
+        r = requests.get(url+"cure.txt")
+        r.encoding = "utf-8"
+        Cure_Text = r.text
         #Main_Data = json.loads(open("assets/main_data.json","r",encoding="utf-8").read())
         #Cure_Text = open("assets/cure.txt", "r" , encoding="utf-8").read()
         time.sleep(60)
