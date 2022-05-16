@@ -1,6 +1,8 @@
+from typing import final
 from fastapi import FastAPI
 from threading import Thread
 import requests
+import json
 import time
 import uvicorn
 app = FastAPI(
@@ -8,33 +10,51 @@ app = FastAPI(
     docs_url="/weibo/docs",
 )
 
-Data = {}
-Times = 0
+Main_Data = {}
+Main_Times = 0
+Cure_Times = 0
+Cure_Text = ""
 
 def Count(fn):
-    global Times
-    Times += 1
+    global Main_Times
+    Main_Times += 1
     return fn
 
 def update():
-    url = "https://raw.githubusercontent.com/A-Soul-Database/Weibo-Armory/main/words.json"
+    url = "https://raw.githubusercontent.com/A-Soul-Database/Weibo-Armory/main/assets/"
     while True:
-        global Data
-        Data = requests.get(url).json()
+        global Main_Data , Cure_Text
+        Main_Data = requests.get(url+"words.json").json()
+        Cure_Text = requests.get(url+"cure.txt").text
+        #Main_Data = json.loads(open("assets/main_data.json","r",encoding="utf-8").read())
+        #Cure_Text = open("assets/cure.txt", "r" , encoding="utf-8").read()
         time.sleep(60)
 
 @Count
 @app.get("/weibo/")
 def root():
-    global Times
-    Times+=1
-    return {"code":"0","data":Data}
+    global Main_Times
+    Main_Times+=1
+    return {"code":"0","data":Main_Data}
 
 @Count
 @app.get("/weibo/stastics")
 def stastics():
-    global Times
-    return {"code":"0","data":Times}
+    global Main_Times , Cure_Times
+    return {"code":"0","data":{"Main_Times":Main_Times,"Cure_Times":Cure_Times}}
+
+@Count
+@app.get("/weibo/cure")
+def Cure():
+    global Cure_Times
+    Cure_Times += 1
+    try:
+        Target_text = Cure_Text[Cure_Times*15:(Cure_Times+1)*15]
+    except IndexError:
+        Cure_Times = 0
+        Target_text = Cure_Text[Cure_Times*15:(Cure_Times+1)*15]
+    finally:
+        return {"code":"0","data":Target_text}
 
 if __name__ == "__main__":
     t = Thread(target=update)
